@@ -1,5 +1,5 @@
 <script setup lang="ts">
-
+const { $useApi } = useNuxtApp();
 const router = useRouter();
 const route = useRoute();
 useHead({
@@ -29,18 +29,16 @@ const newAddress = ref({ address: '', address_type: '', contractor: contractorId
 // Fetch contractor data on load
 const fetchContractor = async () => {
   try {
-    const response = await fetch(`https://vm42106.vpsone.xyz/api/contractors/${contractorId}`);
-    if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
-    const contractorData = await response.json();
+    const {data: contractorsList } = await $useApi.get(`/contractors/${contractorId}/`);
+    const contractorData = contractorsList;
     contractorForm.value = {
       name: contractorData.name || '',
       phone: contractorData.phone || '',
       inn: contractorData.inn || '',
       contractor_type: contractorData.contractor_type || '',
     };
-    const res = await fetch('https://vm42106.vpsone.xyz/api/contractor-types/');
-    if (!res.ok) throw new Error(`HTTP Error: ${res.status}`);
-    contractorsTypes.value = await res.json();
+    const {data: types} = await $useApi.get('/contractor-types/');
+    contractorsTypes.value = types;
     await fetchAddresses()
   } catch (err) {
     error.value = err.message;
@@ -52,15 +50,7 @@ const fetchContractor = async () => {
 // Update contractor data
 const saveContractor = async () => {
   try {
-    const response = await fetch(`https://vm42106.vpsone.xyz/api/contractors/${contractorId}/`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(contractorForm.value),
-    });
-
-    if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
+    const response = await $useApi.patch(`/contractors/${contractorId}/`, contractorForm.value)
 
     successMessage.value = 'Контрагент успешно обновлён!';
     setTimeout(() => (successMessage.value = ''), 3000);
@@ -71,11 +61,7 @@ const saveContractor = async () => {
 
 const deleteContractor = async () => {
   try {
-    const response = await fetch(`https://vm42106.vpsone.xyz/api/contractors/${contractorId}/`, {
-      method: 'DELETE',
-    });
-    if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
-
+    const response = await $useApi.delete(`/contractors/${contractorId}/`);
     console.log('Контрагент удалён!');
     router.push('/contractors');
   } catch (err) {
@@ -85,9 +71,9 @@ const deleteContractor = async () => {
 
 const fetchAddresses = async () => {
   try {
-    const response = await fetch(`https://vm42106.vpsone.xyz/api/contractor-addresses/?contractor=${contractorId}`);
-    if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
-    contractorAddresses.value = await response.json();
+    const {data: addresses} = await $useApi.get(`/contractor-addresses/?contractor=${contractorId}/`);
+
+    contractorAddresses.value = addresses;
     console.log(contractorAddresses.value );
   } catch (err) {
     error.value = err.message;
@@ -98,19 +84,9 @@ const fetchAddresses = async () => {
 
 const addAddress = async () => {
   try {
-    const response = await fetch('https://vm42106.vpsone.xyz/api/contractor-addresses/', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(newAddress.value),
-    });
-
-    if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
-
-    // Добавляем нового контрагента в список
-    const addedAddress = await response.json();
-    contractorAddresses.value.push(addedAddress);
+    const {data: createdAddress} = await $useApi.post('/contractor-addresses/', newAddress.value);
+;
+    contractorAddresses.value.push(createdAddress);
 
     // Закрываем модальное окно
     isDialogOpen.value = false;
@@ -124,11 +100,7 @@ const addAddress = async () => {
 
 const deleteAddress = async (id: number) => {
   try {
-    const response = await fetch(`https://vm42106.vpsone.xyz/api/contractor-addresses/${id}/`, {
-      method: 'DELETE',
-    });
-
-    if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
+    const response = await $useApi.delete(`/contractor-addresses/${id}`);
 
     // Remove the order from the list
     contractorAddresses.value = contractorAddresses.value.filter(address => address.id !== id);
@@ -143,7 +115,9 @@ onMounted(fetchContractor);
 <template>
   <div class="p-6">
     <div class="flex gap-3">
-      <UiButton @click="router.push('/contractors')" class="h-8 w-8"> < </UiButton>
+      <UiButton @click="router.push('/contractors')" class="h-8 w-8">
+        <
+      </UiButton>
       <h1 class="text-2xl font-bold mb-4">Контрагент</h1>
     </div>
 

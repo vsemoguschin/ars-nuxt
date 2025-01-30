@@ -24,7 +24,7 @@ const successMessage = ref('');
 // Fetch prepayment data on load
 const fetchPrepayment = async () => {
   try {
-    const response = await fetch(`https://vm42106.vpsone.xyz/api/prepayments/${prepaymentId}`);
+    const response = await fetch(`https://faunaplus24.ru/api/prepayments/${prepaymentId}`);
     if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
     const prepaymentData = await response.json();
     prepaymentForm.value = {
@@ -37,11 +37,11 @@ const fetchPrepayment = async () => {
       contractor: prepaymentData.contractor || 0,
     };
 
-    const typesResponse = await fetch('https://vm42106.vpsone.xyz/api/prepayment-types/');
+    const typesResponse = await fetch('https://faunaplus24.ru/api/prepayment-types/');
     if (!typesResponse.ok) throw new Error(`HTTP Error: ${typesResponse.status}`);
     prepaymentTypes.value = await typesResponse.json();
 
-    const contractorsResponse = await fetch('https://vm42106.vpsone.xyz/api/contractors/');
+    const contractorsResponse = await fetch('https://faunaplus24.ru/api/contractors/');
     if (!contractorsResponse.ok) throw new Error(`HTTP Error: ${contractorsResponse.status}`);
     contractors.value = await contractorsResponse.json();
   } catch (err) {
@@ -55,7 +55,7 @@ const fetchPrepayment = async () => {
 const savePrepayment = async () => {
   try {
     console.log(prepaymentForm.value.contractor);
-    const response = await fetch(`https://vm42106.vpsone.xyz/api/prepayments/${prepaymentId}/`, {
+    const response = await fetch(`https://faunaplus24.ru/api/prepayments/${prepaymentId}/`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
@@ -74,7 +74,7 @@ const savePrepayment = async () => {
 
 const deletePrepayment = async () => {
   try {
-    const response = await fetch(`https://vm42106.vpsone.xyz/api/prepayments/${prepaymentId}/`, {
+    const response = await fetch(`https://faunaplus24.ru/api/prepayments/${prepaymentId}/`, {
       method: 'DELETE',
     });
     if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
@@ -98,15 +98,15 @@ onMounted(fetchPrepayment);
         </UiButton>
         <h1 class="text-2xl font-bold mb-4">Предоплата</h1>
       </div>
-  
+
       <div v-if="loading" class="text-center">
         <p>Загрузка...</p>
       </div>
-  
+
       <div v-else-if="error" class="text-red-500 text-center">
         <p>Ошибка загрузки: {{ error }}</p>
       </div>
-  
+
       <div v-else class="flex flex-col gap-3">
         <div>
           <UiLabel for="prepayment_type">Тип авансового платежа</UiLabel>
@@ -186,6 +186,6 @@ onMounted(fetchPrepayment);
         </p>
       </div>
     </div>
-    <UiSeparator/>
+    <UiSeparator />
   </div>
 </template>

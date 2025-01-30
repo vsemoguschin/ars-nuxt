@@ -1,4 +1,6 @@
 <script setup lang="ts">
+const { $useApi } = useNuxtApp();
+
 
 const router = useRouter();
 useHead({
@@ -12,9 +14,9 @@ const newUser = ref({ user_full_name: '', username: '', role: '', telegram_id: '
 
 const fetchUsers = async () => {
   try {
-    const response = await fetch('https://vm42106.vpsone.xyz/api/users/');
-    if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
-    users.value = await response.json();
+    // const response = await fetch('https://faunaplus24.ru/api/users/');
+    const { data } = await $useApi.get('/users/');
+    users.value = data;
   } catch (err) {
     error.value = err.message;
   } finally {
@@ -24,18 +26,8 @@ const fetchUsers = async () => {
 
 const createUser = async () => {
   try {
-    const response = await fetch('https://vm42106.vpsone.xyz/api/users/', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(newUser.value),
-    });
+    const {data: createdUser} = await $useApi.post('/users/', newUser.value);
 
-    if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
-
-    // Добавляем нового пользователя в список
-    const createdUser = await response.json();
     users.value.push(createdUser);
 
     // Закрываем модальное окно

@@ -32,7 +32,7 @@ const successMessage = ref('');
 
 const fetchOrder = async () => {
   try {
-    const response = await fetch(`https://vm42106.vpsone.xyz/api/orders/${orderId}`);
+    const response = await fetch(`https://faunaplus24.ru/api/orders/${orderId}`);
     if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
     newOrder.value = await response.json();
     console.log(newOrder.value);
@@ -45,7 +45,7 @@ const fetchOrder = async () => {
 
 const fetchOrderTypes = async () => {
   try {
-    const response = await fetch('https://vm42106.vpsone.xyz/api/order-types/');
+    const response = await fetch('https://faunaplus24.ru/api/order-types/');
     if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
     orderTypes.value = await response.json();
   } catch (err) {
@@ -55,7 +55,7 @@ const fetchOrderTypes = async () => {
 
 const fetchContractors = async () => {
   try {
-    const response = await fetch('https://vm42106.vpsone.xyz/api/contractors/');
+    const response = await fetch('https://faunaplus24.ru/api/contractors/');
     if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
     contractors.value = await response.json();
   } catch (err) {
@@ -65,7 +65,7 @@ const fetchContractors = async () => {
 
 const fetchAddresses = async (contractorId) => {
   try {
-    const response = await fetch(`https://vm42106.vpsone.xyz/api/contractor-addresses/?contractor=${contractorId}`);
+    const response = await fetch(`https://faunaplus24.ru/api/contractor-addresses/?contractor=${contractorId}`);
     if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
     clientAddresses.value = await response.json();
     newOrder.value.client_address = 0;
@@ -78,7 +78,7 @@ const fetchAddresses = async (contractorId) => {
 
 const fetchVehicleTypes = async () => {
   try {
-    const response = await fetch('https://vm42106.vpsone.xyz/api/vehicle-types/');
+    const response = await fetch('https://faunaplus24.ru/api/vehicle-types/');
     if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
     vehicleTypes.value = await response.json();
   } catch (err) {
@@ -88,7 +88,7 @@ const fetchVehicleTypes = async () => {
 
 const updateOrder = async () => {
   try {
-    const response = await fetch(`https://vm42106.vpsone.xyz/api/orders/${orderId}/`, {
+    const response = await fetch(`https://faunaplus24.ru/api/orders/${orderId}/`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
@@ -107,7 +107,7 @@ const updateOrder = async () => {
 
 const deleteOrder = async () => {
   try {
-    const response = await fetch(`https://vm42106.vpsone.xyz/api/orders/${orderId}/`, {
+    const response = await fetch(`https://faunaplus24.ru/api/orders/${orderId}/`, {
       method: 'DELETE',
     });
     if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
@@ -232,8 +232,6 @@ onMounted(async () => {
       </div>
     </div>
   </div>
-  <UiSeparator/>
-  <div>
-
-  </div>
+  <UiSeparator />
+  <div></div>
 </template>

@@ -27,7 +27,7 @@ const newPrepayment = ref({
 // Fetch prepayments, prepayment types, and contractors
 const fetchPrepayments = async () => {
     try {
-        const response = await fetch('https://vm42106.vpsone.xyz/api/prepayments/');
+        const response = await fetch('https://faunaplus24.ru/api/prepayments/');
         if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
         prepayments.value = await response.json();
 
@@ -42,14 +42,14 @@ const fetchPrepayments = async () => {
 };
 
 const getPrepaymetTypes = async () => {
-    const typesResponse = await fetch('https://vm42106.vpsone.xyz/api/prepayment-types/');
+    const typesResponse = await fetch('https://faunaplus24.ru/api/prepayment-types/');
     if (!typesResponse.ok) throw new Error(`HTTP Error: ${typesResponse.status}`);
     prepaymentTypes.value = await typesResponse.json();
     return
 };
 
 const getContractors = async () => {
-    const contractorsResponse = await fetch('https://vm42106.vpsone.xyz/api/contractors/');
+    const contractorsResponse = await fetch('https://faunaplus24.ru/api/contractors/');
     if (!contractorsResponse.ok) throw new Error(`HTTP Error: ${contractorsResponse.status}`);
     contractors.value = await contractorsResponse.json();
 };
@@ -58,7 +58,7 @@ const getContractors = async () => {
 const createPrepayment = async () => {
     try {
         console.log('bvfcvh');
-        const response = await fetch('https://vm42106.vpsone.xyz/api/prepayments/', {
+        const response = await fetch('https://faunaplus24.ru/api/prepayments/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+const { $useApi } = useNuxtApp();
 
 const router = useRouter();
 const route = useRoute();
@@ -20,9 +21,9 @@ const successMessage = ref('');
 // Fetch user data on load
 const fetchUser = async () => {
   try {
-    const response = await fetch(`https://vm42106.vpsone.xyz/api/users/${userId}`);
-    if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
-    const userData = await response.json();
+    const {data:user} = await $useApi.get(`/users/${userId}/`);
+
+    const userData = user;
     userForm.value = {
       username: userData.username || '',
       user_full_name: userData.user_full_name || '',
@@ -39,15 +40,8 @@ const fetchUser = async () => {
 // Update user data
 const saveUser = async () => {
   try {
-    const response = await fetch(`https://vm42106.vpsone.xyz/api/users/${userId}/`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(userForm.value),
-    });
-
-    if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
+    const {data} = await $useApi.patch(`/users/${userId}/`, userForm.value);
+    console.log(data);
 
     successMessage.value = 'Пользователь успешно обновлён!';
     setTimeout(() => (successMessage.value = ''), 3000); // Очистка сообщения через 3 секунды
@@ -58,13 +52,9 @@ const saveUser = async () => {
 
 const deleteUser = async () => {
   try {
-    const response = await fetch(`https://vm42106.vpsone.xyz/api/users/${userId}/`, {
-      method: 'DELETE',
-    });
+    const response = await $useApi.delete(`/users/${userId}/`);
     console.log('пользователь удален!');
-
-    if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
-
+    
   } catch (err) {
     console.error('Ошибка удаления пользователя:', err);
   }

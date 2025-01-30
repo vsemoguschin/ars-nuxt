@@ -22,7 +22,7 @@ const successMessage = ref('');
 // Fetch vehicle data on load
 const fetchVehicle = async () => {
   try {
-    const response = await fetch(`https://vm42106.vpsone.xyz/api/vehicles/${vehicleId}`);
+    const response = await fetch(`https://faunaplus24.ru/api/vehicles/${vehicleId}`);
     if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
     const vehicleData = await response.json();
     vehicleForm.value = {
@@ -34,7 +34,7 @@ const fetchVehicle = async () => {
       status: vehicleData.status || '',
     };
 
-    const res = await fetch('https://vm42106.vpsone.xyz/api/vehicle-types/');
+    const res = await fetch('https://faunaplus24.ru/api/vehicle-types/');
     if (!res.ok) throw new Error(`HTTP Error: ${res.status}`);
     vehicleTypes.value = await res.json();
   } catch (err) {
@@ -47,7 +47,7 @@ const fetchVehicle = async () => {
 // Update vehicle data
 const saveVehicle = async () => {
   try {
-    const response = await fetch(`https://vm42106.vpsone.xyz/api/vehicles/${vehicleId}/`, {
+    const response = await fetch(`https://faunaplus24.ru/api/vehicles/${vehicleId}/`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
@@ -66,7 +66,7 @@ const saveVehicle = async () => {
 
 const deleteVehicle = async () => {
   try {
-    const response = await fetch(`https://vm42106.vpsone.xyz/api/vehicles/${vehicleId}/`, {
+    const response = await fetch(`https://faunaplus24.ru/api/vehicles/${vehicleId}/`, {
       method: 'DELETE',
     });
     if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
@@ -156,7 +156,9 @@ onMounted(fetchVehicle);
         <UiButton @click.stop="deleteVehicle">Удалить</UiButton>
         <UiButton @click="saveVehicle">Сохранить</UiButton>
       </div>
-      <p v-if="successMessage" class="text-green-500 mt-4">{{ successMessage }}</p>
+      <p v-if="successMessage" class="text-green-500 mt-4">
+        {{ successMessage }}
+      </p>
     </div>
   </div>
 </template>

@@ -21,7 +21,7 @@ const newOrder = ref({...orderBlank});
 
 const fetchOrderTypes = async () => {
   try {
-    const response = await fetch('https://vm42106.vpsone.xyz/api/order-types/');
+    const response = await fetch('https://faunaplus24.ru/api/order-types/');
     if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
     orderTypes.value = await response.json();
   } catch (err) {
@@ -31,7 +31,7 @@ const fetchOrderTypes = async () => {
 
 const fetchContractors = async () => {
   try {
-    const response = await fetch('https://vm42106.vpsone.xyz/api/contractors/');
+    const response = await fetch('https://faunaplus24.ru/api/contractors/');
     if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
     contractors.value = await response.json();
   } catch (err) {
@@ -41,7 +41,7 @@ const fetchContractors = async () => {
 
 const fetchAddresses = async (contractorId) => {
   try {
-    const response = await fetch(`https://vm42106.vpsone.xyz/api/contractor-addresses/?contractor=${contractorId}`);
+    const response = await fetch(`https://faunaplus24.ru/api/contractor-addresses/?contractor=${contractorId}`);
     if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
     clientAddresses.value = await response.json();
     console.log('addresses', contractorId, clientAddresses.value);
@@ -52,7 +52,7 @@ const fetchAddresses = async (contractorId) => {
 
 const fetchVehicleTypes = async () => {
   try {
-    const response = await fetch('https://vm42106.vpsone.xyz/api/vehicle-types/');
+    const response = await fetch('https://faunaplus24.ru/api/vehicle-types/');
     if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
     vehicleTypes.value = await response.json();
   } catch (err) {
@@ -65,7 +65,7 @@ const emit = defineEmits(['order-created']);
 // Create order
 const createOrder = async () => {
     try {
-        const response = await fetch('https://vm42106.vpsone.xyz/api/orders/', {
+        const response = await fetch('https://faunaplus24.ru/api/orders/', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

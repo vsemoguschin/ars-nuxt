@@ -5,5 +5,10 @@
     "paths": {
       "@/*": ["./*"]
     },
+    "types": ["@nuxt/types", "@nuxt/schema"],
+    "strict": true,
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "skipLibCheck": true
   }
 }

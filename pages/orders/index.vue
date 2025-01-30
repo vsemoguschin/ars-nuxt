@@ -13,7 +13,7 @@ const isDialogOpen = ref(false);
 // Fetch orders and related data
 const fetchOrders = async () => {
   try {
-    const response = await fetch('https://vm42106.vpsone.xyz/api/orders/');
+    const response = await fetch('https://faunaplus24.ru/api/orders/');
     if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
     orders.value = await response.json();
     console.log(orders.value[0]);
@@ -61,7 +61,7 @@ onMounted(fetchOrders);
 
     <!-- Orders Table -->
     <div v-else>
-      <MyOrdersTable :orders="orders"/>
+      <MyOrdersTable :orders="orders" />
     </div>
   </div>
 </template>

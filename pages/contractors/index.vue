@@ -1,4 +1,5 @@
 <script setup lang="ts">
+const { $useApi } = useNuxtApp();
 
 const router = useRouter();
 useHead({
@@ -9,17 +10,17 @@ const contractorsTypes = ref([]);
 const loading = ref(true);
 const error = ref(null);
 const isDialogOpen = ref(false);
-const newContractor = ref({ name: '', phone: '', inn: '', contractor_type: 'test' });
+const newContractor = ref({ name: '', phone: '', inn: '', contractor_type: '' });
 
 const fetchContractors = async () => {
     try {
-        const response = await fetch('https://vm42106.vpsone.xyz/api/contractors/');
-        if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
-        contractors.value = await response.json();
+        const {data:contractorsList} = await $useApi.get('/contractors/');
+      contractors.value = contractorsList;
+        console.log(contractorsList);
 
-        const res = await fetch('https://vm42106.vpsone.xyz/api/contractor-types/');
-        if (!res.ok) throw new Error(`HTTP Error: ${res.status}`);
-        contractorsTypes.value = await res.json();
+      const { data: types } = await $useApi.get('/contractor-types/');
+        console.log(types);
+        contractorsTypes.value = types;
         console.log(contractorsTypes.value);
     } catch (err) {
         error.value = err.message;
@@ -30,25 +31,15 @@ const fetchContractors = async () => {
 
 const createContractor = async () => {
   try {
-    const response = await fetch('https://vm42106.vpsone.xyz/api/contractors/', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(newContractor.value),
-    });
+    const { data: createdContractor } = await $useApi.post('/contractors/', newContractor.value);
 
-    if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
-
-    // Добавляем нового контрагента в список
-    const createdContractor = await response.json();
     contractors.value.push(createdContractor);
 
     // Закрываем модальное окно
     isDialogOpen.value = false;
 
     // Очищаем форму
-    newContractor.value = { name: '', phone: '', inn: '', contractor_type: 1 };
+    newContractor.value = { name: '', phone: '', inn: '', contractor_type: '' };
   } catch (err) {
     console.error('Ошибка создания контрагента:', err);
   }
