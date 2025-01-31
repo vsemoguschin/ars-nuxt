@@ -1,4 +1,5 @@
 <script setup lang="ts">
+const { $useApi } = useNuxtApp();
 const router = useRouter();
 useHead({
   title: 'Транспортные средства',
@@ -21,13 +22,11 @@ const newVehicle = ref({
 // Fetch vehicles and vehicle types
 const fetchVehicles = async () => {
   try {
-    const response = await fetch('https://faunaplus24.ru/api/vehicles/');
-    if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
-    vehicles.value = await response.json();
+    const {data:vehiclesData } = await $useApi.get('/vehicles/');
+    vehicles.value = vehiclesData;
 
-    const res = await fetch('https://faunaplus24.ru/api/vehicle-types/');
-    if (!res.ok) throw new Error(`HTTP Error: ${res.status}`);
-    vehicleTypes.value = await res.json();
+    const {data: vehicleTypesData} = await $useApi.get('/vehicle-types/');
+    vehicleTypes.value = vehicleTypesData;
   } catch (err) {
     error.value = err.message;
   } finally {
@@ -38,18 +37,9 @@ const fetchVehicles = async () => {
 // Create vehicle
 const createVehicle = async () => {
   try {
-    const response = await fetch('https://faunaplus24.ru/api/vehicles/', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(newVehicle.value),
-    });
-
-    if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
+    const {data: createdVehicle} = await $useApi.post('/vehicles/', newVehicle.value);
 
     // Add new vehicle to the list
-    const createdVehicle = await response.json();
     vehicles.value.push(createdVehicle);
 
     // Close dialog

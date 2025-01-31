@@ -29,7 +29,7 @@ export default defineNuxtPlugin(nuxtApp => {
   // Перехватчик запросов: добавляем токен
   useApi.interceptors.request.use(
     request => {
-      console.log("Отправляем запрос:", request);
+      // console.log("Отправляем запрос:", request);
       const accessToken = localStorage.getItem("accessToken");
       if (accessToken) {
         request.headers["Authorization"] = `Bearer ${accessToken}`;
@@ -48,7 +48,7 @@ export default defineNuxtPlugin(nuxtApp => {
   // Перехватчик ответов: обработка 401 и обновление токена
   useApi.interceptors.response.use(
     response => {
-      console.log("Получен ответ:", response);
+      // console.log("Получен ответ:", response);
       return response;
     },
     async error => {

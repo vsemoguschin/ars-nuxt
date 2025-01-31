@@ -1,4 +1,5 @@
 <script setup lang="ts">
+const { $useApi } = useNuxtApp();
 const router = useRouter();
 const route = useRoute();
 useHead({
@@ -22,9 +23,8 @@ const successMessage = ref('');
 // Fetch vehicle data on load
 const fetchVehicle = async () => {
   try {
-    const response = await fetch(`https://faunaplus24.ru/api/vehicles/${vehicleId}`);
-    if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
-    const vehicleData = await response.json();
+    const {data: vehicleData} = await $useApi.get(`/vehicles/${vehicleId}/`);
+
     vehicleForm.value = {
       vehicle_type: vehicleData.vehicle_type || '',
       registration_number: vehicleData.registration_number || '',
@@ -34,9 +34,8 @@ const fetchVehicle = async () => {
       status: vehicleData.status || '',
     };
 
-    const res = await fetch('https://faunaplus24.ru/api/vehicle-types/');
-    if (!res.ok) throw new Error(`HTTP Error: ${res.status}`);
-    vehicleTypes.value = await res.json();
+    const {data: vehicleTypesData}  = await $useApi.get('/vehicle-types/');
+    vehicleTypes.value = vehicleTypesData;
   } catch (err) {
     error.value = err.message;
   } finally {
@@ -47,18 +46,11 @@ const fetchVehicle = async () => {
 // Update vehicle data
 const saveVehicle = async () => {
   try {
-    const response = await fetch(`https://faunaplus24.ru/api/vehicles/${vehicleId}/`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(vehicleForm.value),
-    });
-
-    if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
+    const {data: updatedVehicle} = await $useApi.patch(`/vehicles/${vehicleId}/`,vehicleForm.value);
 
     successMessage.value = 'Транспортное средство успешно обновлено!';
     setTimeout(() => (successMessage.value = ''), 3000);
+    vehicleForm.value = updatedVehicle;
   } catch (err) {
     error.value = err.message;
   }
@@ -66,10 +58,7 @@ const saveVehicle = async () => {
 
 const deleteVehicle = async () => {
   try {
-    const response = await fetch(`https://faunaplus24.ru/api/vehicles/${vehicleId}/`, {
-      method: 'DELETE',
-    });
-    if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
+    const response = await $useApi.delete(`/vehicles/${vehicleId}`);
 
     console.log('Транспортное средство удалено!');
     router.push('/vehicles');

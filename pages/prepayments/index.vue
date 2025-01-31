@@ -1,4 +1,5 @@
 <script setup lang="ts">
+const { $useApi } = useNuxtApp();
 const router = useRouter();
 useHead({
   title: 'Предоплаты',
@@ -27,9 +28,8 @@ const newPrepayment = ref({
 // Fetch prepayments, prepayment types, and contractors
 const fetchPrepayments = async () => {
     try {
-        const response = await fetch('https://faunaplus24.ru/api/prepayments/');
-        if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
-        prepayments.value = await response.json();
+        const {data: prepaymentsData} = await $useApi.get('/prepayments/');
+        prepayments.value = prepaymentsData;
 
         await getPrepaymetTypes();
 
@@ -42,34 +42,22 @@ const fetchPrepayments = async () => {
 };
 
 const getPrepaymetTypes = async () => {
-    const typesResponse = await fetch('https://faunaplus24.ru/api/prepayment-types/');
-    if (!typesResponse.ok) throw new Error(`HTTP Error: ${typesResponse.status}`);
-    prepaymentTypes.value = await typesResponse.json();
+    const {data:prepaymentTypesData } = await $useApi.get('/prepayment-types/');
+    prepaymentTypes.value = prepaymentTypesData;
     return
 };
 
 const getContractors = async () => {
-    const contractorsResponse = await fetch('https://faunaplus24.ru/api/contractors/');
-    if (!contractorsResponse.ok) throw new Error(`HTTP Error: ${contractorsResponse.status}`);
-    contractors.value = await contractorsResponse.json();
+    const {data: contractorsData} = await $useApi.get('/contractors/');
+    contractors.value = contractorsData;
 };
 
 // Create prepayment
 const createPrepayment = async () => {
     try {
-        console.log('bvfcvh');
-        const response = await fetch('https://faunaplus24.ru/api/prepayments/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(newPrepayment.value),
-        });
-
-        if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
+        const {data: createdPrepayment} = await $useApi.post('/prepayments/', newPrepayment.value);
 
         // Add new prepayment to the list
-        const createdPrepayment = await response.json();
         prepayments.value.push(createdPrepayment);
 
         // Close dialog
@@ -85,7 +73,6 @@ const createPrepayment = async () => {
             total_price: 0,
             contractor: 0,
             contractor_name: '',
-
         };
     } catch (err) {
         console.error('Ошибка создания авансового платежа:', err);
@@ -116,6 +103,14 @@ onMounted(fetchPrepayments);
             <UiDialogDescription />
           </UiDialogHeader>
           <div class="flex flex-col gap-3">
+            <div class="flex flex-col gap-2">
+              <UiLabel for="contractor">Контрагент</UiLabel>
+              <MyComboboxModels
+                :items="contractors.map(contractor => ({ value: contractor.id, label: contractor.name }))"
+                :label="'Выбрать'"
+                @selected-item="(value) => newPrepayment.contractor = value"
+              />
+            </div>
             <div>
               <UiLabel for="prepayment_type">Тип предоплаты</UiLabel>
               <MyCombobox
@@ -177,14 +172,7 @@ onMounted(fetchPrepayments);
                 placeholder="Введите общую стоимость"
               />
             </div>
-            <div class="flex flex-col gap-2">
-              <UiLabel for="contractor">Контрагент</UiLabel>
-              <MyComboboxModels
-                :items="contractors.map(contractor => ({ value: contractor.id, label: contractor.name }))"
-                :label="'Выбрать'"
-                @selected-item="(value) => newPrepayment.contractor = value"
-              />
-            </div>
+            
           </div>
           <UiDialogFooter>
             <div class="flex justify-between w-full">

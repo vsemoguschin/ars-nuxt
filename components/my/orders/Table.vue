@@ -1,12 +1,11 @@
 <script lang="ts" setup>
 const router = useRouter();
-
 defineProps({
     orders: {
-        type: Object,
-        requared: true,
+        type: Array,
+        required: true,
     }
-});
+})
 </script>
 
 <template>
@@ -14,13 +13,14 @@ defineProps({
     <UiTableCaption>Список заказов.</UiTableCaption>
     <UiTableHeader class="bg-slate-100">
       <UiTableRow>
-        <UiTableHead>Тип заказа</UiTableHead>
-        <UiTableHead>Дата заказа</UiTableHead>
-        <UiTableHead>Контрагент</UiTableHead>
-        <UiTableHead>Подрядчик</UiTableHead>
-        <UiTableHead>ТС</UiTableHead>
-        <UiTableHead>Объем</UiTableHead>
-        <UiTableHead>Статус</UiTableHead>
+        <UiTableHead>Тип</UiTableHead>
+        <UiTableHead>Дата</UiTableHead>
+        <UiTableHead>Клиент</UiTableHead>
+        <UiTableHead>Адрес</UiTableHead>
+        <UiTableHead>Поставщик</UiTableHead>
+        <UiTableHead>Тип транспорта</UiTableHead>
+        <UiTableHead>Общий объем</UiTableHead>
+        <UiTableHead>Объем материала</UiTableHead>
       </UiTableRow>
     </UiTableHeader>
     <UiTableBody>
@@ -33,10 +33,13 @@ defineProps({
         <UiTableCell>{{ order.order_type }}</UiTableCell>
         <UiTableCell>{{ order.order_date }}</UiTableCell>
         <UiTableCell>{{ order.client_info.name }}</UiTableCell>
-        <UiTableCell>{{ order.supplier_info.name }}</UiTableCell>
+        <UiTableCell
+          >{{ order?.client_address_info?.address || ''}}</UiTableCell
+        >
+        <UiTableCell>{{ order.supplier }}</UiTableCell>
         <UiTableCell>{{ order.vehicle_type }}</UiTableCell>
+        <UiTableCell>{{ order.total_handled_volume }}</UiTableCell>
         <UiTableCell>{{ order.material_volume }}</UiTableCell>
-        <UiTableCell>{{ order.status }}</UiTableCell>
       </UiTableRow>
     </UiTableBody>
   </UiTable>

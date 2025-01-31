@@ -1,4 +1,5 @@
 <script setup lang="ts">
+const { $useApi } = useNuxtApp();
 const router = useRouter();
 const route = useRoute();
 useHead({
@@ -24,9 +25,8 @@ const successMessage = ref('');
 // Fetch prepayment data on load
 const fetchPrepayment = async () => {
   try {
-    const response = await fetch(`https://faunaplus24.ru/api/prepayments/${prepaymentId}`);
-    if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
-    const prepaymentData = await response.json();
+    const {data: prepaymentData} = await $useApi.get(`/prepayments/${prepaymentId}`);
+
     prepaymentForm.value = {
       prepayment_type: prepaymentData.prepayment_type || '',
       unit: prepaymentData.unit || 'm3',
@@ -37,13 +37,11 @@ const fetchPrepayment = async () => {
       contractor: prepaymentData.contractor || 0,
     };
 
-    const typesResponse = await fetch('https://faunaplus24.ru/api/prepayment-types/');
-    if (!typesResponse.ok) throw new Error(`HTTP Error: ${typesResponse.status}`);
-    prepaymentTypes.value = await typesResponse.json();
+    const {data: typesResponse} = await $useApi.get('/prepayment-types/');
+    prepaymentTypes.value = typesResponse;
 
-    const contractorsResponse = await fetch('https://faunaplus24.ru/api/contractors/');
-    if (!contractorsResponse.ok) throw new Error(`HTTP Error: ${contractorsResponse.status}`);
-    contractors.value = await contractorsResponse.json();
+    const {data: contractorsResponse} = await $useApi.get('/contractors/');
+    contractors.value = contractorsResponse;
   } catch (err) {
     error.value = err.message;
   } finally {
@@ -55,15 +53,9 @@ const fetchPrepayment = async () => {
 const savePrepayment = async () => {
   try {
     console.log(prepaymentForm.value.contractor);
-    const response = await fetch(`https://faunaplus24.ru/api/prepayments/${prepaymentId}/`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(prepaymentForm.value),
-    });
+    const {data: updatedPrepayment} = await $useApi.patch(`/prepayments/${prepaymentId}/`,prepaymentForm.value);
 
-    if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
+    prepaymentForm.value = updatedPrepayment;
 
     successMessage.value = 'Авансовый платеж успешно обновлён!';
     setTimeout(() => (successMessage.value = ''), 3000);
@@ -74,11 +66,7 @@ const savePrepayment = async () => {
 
 const deletePrepayment = async () => {
   try {
-    const response = await fetch(`https://faunaplus24.ru/api/prepayments/${prepaymentId}/`, {
-      method: 'DELETE',
-    });
-    if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
-
+    await $useApi.delete(`/prepayments/${prepaymentId}/`);
     console.log('Авансовый платеж удалён!');
     router.push('/prepayments');
   } catch (err) {
@@ -108,6 +96,14 @@ onMounted(fetchPrepayment);
       </div>
 
       <div v-else class="flex flex-col gap-3">
+        <div class="flex flex-col gap-3">
+          <UiLabel for="contractor">Контрагент</UiLabel>
+          <MyComboboxModels
+            :items="contractors.map(contractor => ({ value: contractor.id, label: contractor.name }))"
+            :label="contractors.find(c=>c.id===prepaymentForm.contractor).name"
+            @selected-item="(value) => prepaymentForm.contractor = value"
+          />
+        </div>
         <div>
           <UiLabel for="prepayment_type">Тип авансового платежа</UiLabel>
           <MyCombobox
@@ -169,14 +165,7 @@ onMounted(fetchPrepayment);
             placeholder="Введите общую стоимость"
           />
         </div>
-        <div class="flex flex-col gap-3">
-          <UiLabel for="contractor">Контрагент</UiLabel>
-          <MyComboboxModels
-            :items="contractors.map(contractor => ({ value: contractor.id, label: contractor.name }))"
-            :label="contractors.find(c=>c.id===prepaymentForm.contractor).name"
-            @selected-item="(value) => prepaymentForm.contractor = value"
-          />
-        </div>
+        
         <div class="mt-4 flex justify-between">
           <UiButton @click.stop="deletePrepayment">Удалить</UiButton>
           <UiButton @click="savePrepayment">Сохранить</UiButton>

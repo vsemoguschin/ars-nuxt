@@ -6,8 +6,10 @@ useHead({
   title: 'Контрагент',
 });
 
+
 const contractorId = route.params.id;
 const contractorForm = ref({
+  id: 0,
   name: '',
   phone: '',
   inn: '',
@@ -18,10 +20,8 @@ const loading = ref(true);
 const error = ref(null);
 const successMessage = ref('');
 
-const contractorAddresses = ref([{
-  address_type: '',
-  address: '',
-}]);
+const contractorAddresses = ref([]);
+const contractorOrders = ref([]);
 const isDialogOpen = ref(false);
 const newAddress = ref({ address: '', address_type: '', contractor: contractorId, });
 
@@ -29,9 +29,10 @@ const newAddress = ref({ address: '', address_type: '', contractor: contractorId
 // Fetch contractor data on load
 const fetchContractor = async () => {
   try {
-    const {data: contractorsList } = await $useApi.get(`/contractors/${contractorId}/`);
-    const contractorData = contractorsList;
+    const {data: contractorData } = await $useApi.get(`/contractors/${contractorId}/`);
+
     contractorForm.value = {
+      id: contractorData.id || 0,
       name: contractorData.name || '',
       phone: contractorData.phone || '',
       inn: contractorData.inn || '',
@@ -40,6 +41,7 @@ const fetchContractor = async () => {
     const {data: types} = await $useApi.get('/contractor-types/');
     contractorsTypes.value = types;
     await fetchAddresses()
+    await fetchOrders()
   } catch (err) {
     error.value = err.message;
   } finally {
@@ -61,7 +63,7 @@ const saveContractor = async () => {
 
 const deleteContractor = async () => {
   try {
-    const response = await $useApi.delete(`/contractors/${contractorId}/`);
+    const response = await $useApi.delete(`/contractors/${contractorId}`);
     console.log('Контрагент удалён!');
     router.push('/contractors');
   } catch (err) {
@@ -71,7 +73,7 @@ const deleteContractor = async () => {
 
 const fetchAddresses = async () => {
   try {
-    const {data: addresses} = await $useApi.get(`/contractor-addresses/?contractor=${contractorId}/`);
+    const {data: addresses} = await $useApi.get(`/contractor-addresses/?contractor=${contractorId}`);
 
     contractorAddresses.value = addresses;
     console.log(contractorAddresses.value );
@@ -106,6 +108,17 @@ const deleteAddress = async (id: number) => {
     contractorAddresses.value = contractorAddresses.value.filter(address => address.id !== id);
   } catch (err) {
     console.error('Ошибка удаления адреса:', err);
+  }
+};
+
+const fetchOrders = async () => {
+  try {
+    const { data: ordersData } = await $useApi.get('/orders/?contractor=${contractorId}');
+    contractorOrders.value = ordersData;
+  } catch (err) {
+    error.value = err.message;
+  } finally {
+    loading.value = false;
   }
 };
 
@@ -176,8 +189,8 @@ onMounted(fetchContractor);
     </div>
   </div>
   <UiSeparator label="" />
-  <!-- АДРЕССА -->
-  <div class="p-6">
+  <!-- АДРЕСА -->
+  <div class="p-6 pb-2">
     <div class="flex gap-3">
       <UiDialog v-model:open="isDialogOpen">
         <UiDialogTrigger as-child>
@@ -190,12 +203,12 @@ onMounted(fetchContractor);
           </UiDialogHeader>
           <div class="flex flex-col gap-3">
             <div>
-              <UiLabel for="address">Адресс</UiLabel>
+              <UiLabel for="address">Адрес</UiLabel>
               <UiInput
                 class="mt-2"
                 id="address"
                 v-model="newAddress.address"
-                placeholder="Введите адресс контрагента"
+                placeholder="Введите адрес контрагента"
               />
             </div>
             <div>
@@ -221,11 +234,11 @@ onMounted(fetchContractor);
       <h1 class="text-2xl font-bold mb-4">Адреса контрагента</h1>
     </div>
     <UiTable>
-      <UiTableCaption>Список адрессов.</UiTableCaption>
+      <UiTableCaption/>
       <UiTableHeader class="bg-slate-100">
         <UiTableRow>
           <UiTableHead>Тип</UiTableHead>
-          <UiTableHead>Адресс</UiTableHead>
+          <UiTableHead>Адрес</UiTableHead>
           <UiTableHead>Действия</UiTableHead>
         </UiTableRow>
       </UiTableHeader>
@@ -241,6 +254,35 @@ onMounted(fetchContractor);
         </UiTableRow>
       </UiTableBody>
     </UiTable>
+  </div>
+  <UiSeparator label="" />
+  <!-- ЗАЯВКИ -->
+  <div class="p-6">
+    <div class="flex gap-3">
+      <div>
+        <UiDialog v-model:open="isDialogOpen">
+          <UiDialogTrigger as-child>
+            <UiButton class="h-8 w-8"> + </UiButton>
+          </UiDialogTrigger>
+          <UiDialogContent>
+            <UiDialogHeader>
+              <UiDialogTitle>Создать заказ</UiDialogTitle>
+              <UiDialogDescription />
+            </UiDialogHeader>
+            <!-- форма создания заказа -->
+            <MyOrdersOrderForm
+              :client="contractorForm"
+              :client_addresses="contractorAddresses"
+              @order-created="()=>{fetchOrders(), isDialogOpen=false}"
+            />
+            <!-- форма создания заказа -->
+            <UiDialogFooter />
+          </UiDialogContent>
+        </UiDialog>
+      </div>
+      <h1 class="text-2xl font-bold mb-4">Заказы</h1>
+    </div>
+    <MyOrdersTable :orders="contractorOrders" />
   </div>
   <UiSeparator label="" />
   <!-- ПРЕДОПЛАТЫ -->

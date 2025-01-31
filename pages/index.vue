@@ -4,7 +4,7 @@ useHead({
 });
 
 const links = [
-  { name: 'Пользователи', path: '/users' },
+  // { name: 'Пользователи', path: '/users' },
   { name: 'Контрагенты', path: '/contractors' },
   { name: 'Транспортные средства', path: '/vehicles' },
   { name: 'Предоплаты', path: '/prepayments' },
